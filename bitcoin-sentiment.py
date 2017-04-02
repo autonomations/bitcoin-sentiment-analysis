@@ -24,31 +24,11 @@ def main():
     # fetch tweets by keywords
     tweets = twitter_api.search(q=['bitcoin, price'], count=100)
 
-    # get polarity and subjectivity data
-    polarity = get_polarity(tweets)
-    subjectivity = get_subjectivity(tweets)
+    get_sentiment_stats(tweets, get_polarity, get_subjectivity)
+    # generate sentiment stats
 
-    # print sentiment stats
-    print('Polarity count: %s' % np.count_nonzero(polarity))
-    print('Polarity average: %.3f' % np.mean(polarity))
-    print('Polarity standard deviation: %.3f' % np.std(polarity))
-    print('Polarity coefficient of variation: %.3f' % (np.std(polarity) / np.mean(polarity)))
-    print('********')
-    print('Subjectivity count: %s' % np.count_nonzero(subjectivity))
-    print('Subjectivity average: %.3f' % np.mean(subjectivity))
-    print('Subjectivity standard deviation: %.3f' % np.std(subjectivity))
-    print('Subjectivity coefficient of variation: %.3f' % (np.std(subjectivity) / np.mean(subjectivity)))
-
-    # save tweets, polarity, subjectivity, and sentiment class to csv file
-    with open(path, 'w') as f:
-        writer = csv.writer(f)
-        f.write('tweet, polarity, subjectivity, sentiment_class\n')
-
-        for tweet in tweets:
-            analysis = TextBlob(tweet.text)
-            writer.writerow([tweet.text.encode('utf8'), analysis.sentiment.polarity, analysis.sentiment.subjectivity, classify_sentiment(analysis)])
-
-        f.close()
+    save_sentiment_to_csv(tweets, path, classify_sentiment)
+    # save sentiment data to csv file
 
 
 def get_polarity(tweets):
@@ -84,6 +64,36 @@ def classify_sentiment(analysis, threshold = 0):
         return 'Negative'
     else:
         return 'Neutral'
+
+
+def get_sentiment_stats(tweets, get_polarity, get_subjectivity):
+    # generate sentiment stats
+
+    polarity = get_polarity(tweets)
+    subjectivity = get_subjectivity(tweets)
+
+    print('Polarity count: %s' % np.count_nonzero(polarity))
+    print('Polarity average: %.3f' % np.mean(polarity))
+    print('Polarity standard deviation: %.3f' % np.std(polarity))
+    print('Polarity coefficient of variation: %.3f' % (np.std(polarity) / np.mean(polarity)))
+    print('********')
+    print('Subjectivity count: %s' % np.count_nonzero(subjectivity))
+    print('Subjectivity average: %.3f' % np.mean(subjectivity))
+    print('Subjectivity standard deviation: %.3f' % np.std(subjectivity))
+    print('Subjectivity coefficient of variation: %.3f' % (np.std(subjectivity) / np.mean(subjectivity)))
+
+
+def save_sentiment_to_csv(tweets, path, classify_sentiment):
+    # save tweets, polarity, subjectivity, and sentiment class to csv file
+    with open(path, 'w') as f:
+        writer = csv.writer(f)
+        f.write('tweet, polarity, subjectivity, sentiment_class\n')
+
+        for tweet in tweets:
+            analysis = TextBlob(tweet.text)
+            writer.writerow([tweet.text.encode('utf8'), analysis.sentiment.polarity, analysis.sentiment.subjectivity, classify_sentiment(analysis)])
+
+        f.close()
 
 
 if __name__ == '__main__':
