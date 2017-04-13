@@ -24,12 +24,12 @@ def main():
     # fetch tweets by keywords
     tweets = twitter_api.search(q=['bitcoin, price'], count=100)
 
-    get_sentiment_stats(tweets, get_polarity, get_subjectivity)
     # generate sentiment stats
+    get_sentiment_stats(tweets, get_polarity, get_subjectivity)
 
-    save_sentiment_to_csv(tweets, path, classify_sentiment)
     # save sentiment data to csv file
-
+    save_sentiment_to_csv(tweets, path, classify_sentiment)
+    
 
 def get_polarity(tweets):
     # run polarity analysis on tweets
